@@ -112,8 +112,9 @@ static CGSize SQUARE_DIMENSIONS  = {SQUARE_SIZE,SQUARE_SIZE};
     
     
 }
-#define WALL_WIDTH 40
-#define WALL_HEIGHT 500
+#define WALL_WIDTH 500
+#define WALL_HEIGHT 40
+
 
 -(void) resumeGame
 {
@@ -134,15 +135,22 @@ static CGSize SQUARE_DIMENSIONS  = {SQUARE_SIZE,SQUARE_SIZE};
         
         // Setting their animation
         
+        
+        CGPoint rightEdge = CGPointMake(self.wall.frame.origin.x +
+                                        self.wall.frame.size.width, self.wall.frame.origin.y);
+        [self.collider addBoundaryWithIdentifier:@"barrier" fromPoint:self.wall.bounds.origin toPoint:rightEdge];
+        
+        
+        UIBezierPath * path;
+        [self.collider addBoundaryWithIdentifier:@"walls" forPath:path];
+        
+        
         [self.collider addItem:self.redBall ];
         [self.elastic addItem:self.redBall ];
         [self.gravity addItem:self.redBall ];
         [self.quicksand addItem:self.redBall];
-        [self.quicksand addItem:self.wall];
 
         
-        [self.collider addItem:self.wall];
-        [self.rotation addItem:self.wall];
 
 
 
