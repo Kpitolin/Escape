@@ -123,33 +123,48 @@ static CGSize SQUARE_DIMENSIONS  = {SQUARE_SIZE,SQUARE_SIZE};
     if (! self.redBall && ! self.wall)
     {
         // Setting the ball  frame and color
-        self.redBall = [self addBlockOffsetFromCenterBy:UIOffsetMake(-100, 0) withX:SQUARE_DIMENSIONS.width andY:SQUARE_DIMENSIONS.height];
+        self.redBall = [self addBlockOffsetFromCenterBy:UIOffsetMake(0, 0) withX:SQUARE_DIMENSIONS.width andY:SQUARE_DIMENSIONS.height];
         self.redBall.layer.cornerRadius = SQUARE_SIZE/2;
 
         self.redBall.backgroundColor = [UIColor blueColor];
         
         // Setting the walls
 
-        self.wall = [self addBlockOffsetFromCenterBy:UIOffsetMake(-200, 0) withX:WALL_WIDTH andY:WALL_HEIGHT];
-        self.wall.backgroundColor = [UIColor blackColor];
+        //self.wall = [self addBlockOffsetFromCenterBy:UIOffsetMake(-200, 0) withX:WALL_WIDTH andY:WALL_HEIGHT];
+        //self.wall.backgroundColor = [UIColor blackColor];
         
         // Setting their animation
         
         
-        CGPoint rightEdge = CGPointMake(self.wall.frame.origin.x +
-                                        self.wall.frame.size.width, self.wall.frame.origin.y);
-        [self.collider addBoundaryWithIdentifier:@"barrier" fromPoint:self.wall.bounds.origin toPoint:rightEdge];
+        //CGPoint rightEdge = CGPointMake(self.wall.frame.origin.x +
+        //                                self.wall.frame.size.width, self.wall.frame.origin.y);
+        //[self.collider addBoundaryWithIdentifier:@"barrier" fromPoint:self.wall.bounds.origin toPoint:rightEdge];
         
         
-        UIBezierPath * path;
-        [self.collider addBoundaryWithIdentifier:@"walls" forPath:path];
+        UIBezierPath * path1 = [UIBezierPath bezierPathWithRect:CGRectMake( 0.0,self.view.bounds.size.height/4, self.view.bounds.size.width/3, self.view.bounds.size.height*3/4)];
+        UIBezierPath * path2 = [UIBezierPath bezierPathWithRect:CGRectMake(self.view.bounds.size.width*2/3, 0.0, self.view.bounds.size.width/3, self.view.bounds.size.height*3/4)];
+        
+        /*[path1 closePath];
+        [path2 closePath];
+        [path1 fill];
+        [path2 fill];
+        CAShapeLayer *shapeView = [[CAShapeLayer alloc] init];
+        [shapeView setPath:(__bridge CGPathRef)(path1)];
+        [[self.view layer] addSublayer:shapeView];
+        CAShapeLayer *shapeView2 = [[CAShapeLayer alloc] init];
+        [shapeView2 setPath:(__bridge CGPathRef)(path2)];
+        [[self.view layer] addSublayer:shapeView2];
+        */
+        [self.collider addBoundaryWithIdentifier:@"wall1" forPath:path1];
+        [self.collider addBoundaryWithIdentifier:@"wall2" forPath:path2];
+
         
         
         [self.collider addItem:self.redBall ];
         [self.elastic addItem:self.redBall ];
         [self.gravity addItem:self.redBall ];
         [self.quicksand addItem:self.redBall];
-
+        
         
 
 

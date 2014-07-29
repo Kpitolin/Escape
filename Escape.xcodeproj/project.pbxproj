@@ -471,6 +471,7 @@
 				0A31F4291949C6040066C667 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		0A31F42A1949C6040066C667 /* Build configuration list for PBXNativeTarget "EscapeTests" */ = {
 			isa = XCConfigurationList;
@@ -479,6 +480,7 @@
 				0A31F42C1949C6040066C667 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
