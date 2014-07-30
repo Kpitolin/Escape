@@ -22,6 +22,7 @@
 		0A31F41A1949C6040066C667 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A31F3F91949C6040066C667 /* UIKit.framework */; };
 		0A31F4221949C6040066C667 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 0A31F4201949C6040066C667 /* InfoPlist.strings */; };
 		0A31F4241949C6040066C667 /* EscapeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A31F4231949C6040066C667 /* EscapeTests.m */; };
+		DE46256719897AA2002544E7 /* PlaygroundView.m in Sources */ = {isa = PBXBuildFile; fileRef = DE46256619897AA2002544E7 /* PlaygroundView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -55,6 +56,8 @@
 		0A31F41F1949C6040066C667 /* EscapeTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "EscapeTests-Info.plist"; sourceTree = "<group>"; };
 		0A31F4211949C6040066C667 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		0A31F4231949C6040066C667 /* EscapeTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EscapeTests.m; sourceTree = "<group>"; };
+		DE46256519897AA2002544E7 /* PlaygroundView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlaygroundView.h; sourceTree = "<group>"; };
+		DE46256619897AA2002544E7 /* PlaygroundView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PlaygroundView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -118,6 +121,8 @@
 				0A31F4051949C6040066C667 /* EscapeAppDelegate.m */,
 				0A31F4071949C6040066C667 /* Main_iPhone.storyboard */,
 				0A31F40A1949C6040066C667 /* Main_iPad.storyboard */,
+				DE46256519897AA2002544E7 /* PlaygroundView.h */,
+				DE46256619897AA2002544E7 /* PlaygroundView.m */,
 				0A31F40D1949C6040066C667 /* EscapeViewController.h */,
 				0A31F40E1949C6040066C667 /* EscapeViewController.m */,
 				0A31F4101949C6040066C667 /* Images.xcassets */,
@@ -257,6 +262,7 @@
 				0A31F4021949C6040066C667 /* main.m in Sources */,
 				0A31F40F1949C6040066C667 /* EscapeViewController.m in Sources */,
 				0A31F4061949C6040066C667 /* EscapeAppDelegate.m in Sources */,
+				DE46256719897AA2002544E7 /* PlaygroundView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

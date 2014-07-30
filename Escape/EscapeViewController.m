@@ -7,10 +7,10 @@
 //
 #import <CoreMotion/CoreMotion.h>
 #import "EscapeViewController.h"
-
+#import "PlaygroundView.h"
 @interface EscapeViewController ()
-@property (nonatomic, strong)UIView * redBall;
-@property (nonatomic, strong)UIView * wall;
+@property (nonatomic, strong)UIView * ball;
+@property (nonatomic , strong) PlaygroundView * playground;
 
 // The following is strong because anything don't have
 @property (nonatomic, strong) UIDynamicAnimator* animator;
@@ -94,9 +94,6 @@ static CGSize SQUARE_DIMENSIONS  = {SQUARE_SIZE,SQUARE_SIZE};
 
     // Put the red Block on screen
     
-    [self.view addSubview:ballView];
-    
-    
     
     return ballView;
 }
@@ -106,71 +103,59 @@ static CGSize SQUARE_DIMENSIONS  = {SQUARE_SIZE,SQUARE_SIZE};
     [self.motionManager stopAccelerometerUpdates ];
     self.gravity.gravityDirection = CGVectorMake(0, 0);  // at start we have no gravity going on
     self.quicksand.resistance = 10.0;
-    
-    
-    
-    
+
     
 }
 #define WALL_WIDTH 500
 #define WALL_HEIGHT 40
+-(PlaygroundView *) createPlayGround
+{
+    
 
+    PlaygroundView* walls = [[PlaygroundView alloc ]initWithFrame:self.view.bounds ];
+    
+    UIBezierPath * path1 = [UIBezierPath bezierPathWithRect:CGRectMake( 0.0,self.view.bounds.size.height/4, self.view.bounds.size.width/3, self.view.bounds.size.height*3/4)];
+    UIBezierPath * path2 = [UIBezierPath bezierPathWithRect:CGRectMake(self.view.bounds.size.width*2/3, 0.0, self.view.bounds.size.width/3, self.view.bounds.size.height*3/4)];
+    walls.bezierPathArray = @[path1,path2];
+    NSArray * matrice =  @[
+                                             @[ @1, @1, @1, @1],
+                                             @[ @0, @0, @0, @1],
+                                             @[ @1, @1, @0, @1],
+                                             @[ @1, @1, @0, @1],
+                                             ];
+    
+    [self.view  addSubview: walls];
+
+    return walls;
+    
+}
 
 -(void) resumeGame
 {
     self.quicksand.resistance = 0;
     
-    if (! self.redBall && ! self.wall)
+    if (! self.ball && !self.playground )
     {
         // Setting the ball  frame and color
-        self.redBall = [self addBlockOffsetFromCenterBy:UIOffsetMake(0, 0) withX:SQUARE_DIMENSIONS.width andY:SQUARE_DIMENSIONS.height];
-        self.redBall.layer.cornerRadius = SQUARE_SIZE/2;
+        self.ball = [self addBlockOffsetFromCenterBy:UIOffsetMake(0, 0) withX:SQUARE_DIMENSIONS.width andY:SQUARE_DIMENSIONS.height];
+        self.ball.layer.cornerRadius = SQUARE_SIZE/2;
 
-        self.redBall.backgroundColor = [UIColor blueColor];
+        self.ball.backgroundColor = [UIColor blueColor];
         
-        // Setting the walls
+        self.playground = [self createPlayGround];
+        int i = 0;
+        for ( UIBezierPath * bezierPath in self.playground.bezierPathArray) {
+            [self.collider addBoundaryWithIdentifier:[ NSString stringWithFormat: @"wall%d",i] forPath:bezierPath];
+            i++;
 
-        //self.wall = [self addBlockOffsetFromCenterBy:UIOffsetMake(-200, 0) withX:WALL_WIDTH andY:WALL_HEIGHT];
-        //self.wall.backgroundColor = [UIColor blackColor];
-        
-        // Setting their animation
-        
-        
-        //CGPoint rightEdge = CGPointMake(self.wall.frame.origin.x +
-        //                                self.wall.frame.size.width, self.wall.frame.origin.y);
-        //[self.collider addBoundaryWithIdentifier:@"barrier" fromPoint:self.wall.bounds.origin toPoint:rightEdge];
-        
-        
-        UIBezierPath * path1 = [UIBezierPath bezierPathWithRect:CGRectMake( 0.0,self.view.bounds.size.height/4, self.view.bounds.size.width/3, self.view.bounds.size.height*3/4)];
-        UIBezierPath * path2 = [UIBezierPath bezierPathWithRect:CGRectMake(self.view.bounds.size.width*2/3, 0.0, self.view.bounds.size.width/3, self.view.bounds.size.height*3/4)];
-        
-        /*[path1 closePath];
-        [path2 closePath];
-        [path1 fill];
-        [path2 fill];
-        CAShapeLayer *shapeView = [[CAShapeLayer alloc] init];
-        [shapeView setPath:(__bridge CGPathRef)(path1)];
-        [[self.view layer] addSublayer:shapeView];
-        CAShapeLayer *shapeView2 = [[CAShapeLayer alloc] init];
-        [shapeView2 setPath:(__bridge CGPathRef)(path2)];
-        [[self.view layer] addSublayer:shapeView2];
-        */
-        [self.collider addBoundaryWithIdentifier:@"wall1" forPath:path1];
-        [self.collider addBoundaryWithIdentifier:@"wall2" forPath:path2];
+        }
+        [self.playground addSubview:self.ball];
 
-        
-        
-        [self.collider addItem:self.redBall ];
-        [self.elastic addItem:self.redBall ];
-        [self.gravity addItem:self.redBall ];
-        [self.quicksand addItem:self.redBall];
-        
-        
+        [self.collider addItem:self.ball];
+        [self.elastic addItem:self.ball];
+        [self.gravity addItem:self.ball];
+        [self.quicksand addItem:self.ball];
 
-
-
-        
-        
         
     }
     
@@ -181,6 +166,7 @@ static CGSize SQUARE_DIMENSIONS  = {SQUARE_SIZE,SQUARE_SIZE};
             [self.motionManager startAccelerometerUpdatesToQueue:[NSOperationQueue mainQueue] withHandler:^(CMAccelerometerData *accelerometerData, NSError *error) {
                 CGFloat x = accelerometerData.acceleration.x;
                 CGFloat y = accelerometerData.acceleration.y;
+                
                 switch (self.interfaceOrientation) {
                     case UIInterfaceOrientationLandscapeRight:
                         self.gravity.gravityDirection = CGVectorMake(-y, -x);
@@ -210,7 +196,6 @@ static CGSize SQUARE_DIMENSIONS  = {SQUARE_SIZE,SQUARE_SIZE};
     }
     
 }
-
 
 
 -(void)alert:(NSString *)msg
@@ -261,7 +246,6 @@ static CGSize SQUARE_DIMENSIONS  = {SQUARE_SIZE,SQUARE_SIZE};
 // We'll need to custom that (with the real gravity with Core Motion)
 
 
-
 - (UICollisionBehavior *)collider{
     if (!_collider)
     {
@@ -285,18 +269,7 @@ static CGSize SQUARE_DIMENSIONS  = {SQUARE_SIZE,SQUARE_SIZE};
     return _elastic;
 }
 
-- (UIAttachmentBehavior *) attachment
-{
-    if (!_attachment)
-    {
-        UIAttachmentBehavior * attachment  = [[UIAttachmentBehavior alloc] initWithItem:self.wall attachedToAnchor:self.wall.bounds.origin] ;
-        [self.animator addBehavior:attachment];
-        [attachment setFrequency:50.0];
-        [attachment setDamping:0.5];
-        self.attachment  = attachment;
-    }
-    return _attachment;
-}
+
 - (UIDynamicItemBehavior *) rotation
 {
     if (!_rotation)
@@ -318,18 +291,6 @@ static CGSize SQUARE_DIMENSIONS  = {SQUARE_SIZE,SQUARE_SIZE};
     
     return _quicksand ;
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 @end
