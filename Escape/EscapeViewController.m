@@ -8,8 +8,11 @@
 #import <CoreMotion/CoreMotion.h>
 #import "EscapeViewController.h"
 #import "PlaygroundView.h"
+#import "UIAlertView+BlockAddition.h"
+
 @interface EscapeViewController ()<UICollisionBehaviorDelegate>
 @property (nonatomic, strong)UIView * ball;
+@property (nonatomic, strong)UIView * doorView;
 @property (nonatomic , strong) PlaygroundView * playground;
 
 // The following is strong because anything don't have
@@ -37,7 +40,10 @@
     [self resumeGame];
 }
 -(void) viewDidLoad
+
 {
+    self.collider.collisionDelegate = self;
+
     [self.view addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tap)]];
     [[NSNotificationCenter defaultCenter] addObserverForName:UIApplicationWillResignActiveNotification
                                                       object:nil
@@ -213,14 +219,13 @@ static CGFloat heightOfRect;
         UIView * doorView = [[UIView alloc] initWithFrame:door];
         doorView.layer.cornerRadius = heightOfRect/4;
         doorView.backgroundColor = [UIColor grayColor];
-
+        self.doorView = doorView;
         // Setting the ball  frame and color
         self.ball = [self addBlockForCenter:startPoint withX:SQUARE_DIMENSIONS.width andY:SQUARE_DIMENSIONS.height];
         self.ball.layer.cornerRadius = SQUARE_SIZE/2;
         
         self.ball.backgroundColor = [UIColor blackColor];
-        self.ball.alpha =0.5;
-        [self.playground addSubview:doorView];
+        [self.playground addSubview:self.doorView];
         [self.playground addSubview:self.ball];
 
         [self.collider addItem:self.ball];
@@ -290,7 +295,7 @@ static CGFloat heightOfRect;
     return  _animator;
 }
 
-#define UPDATES_PER_SECOND 100
+#define UPDATES_PER_SECOND 50
 -(CMMotionManager *) motionManager
 {
     if (!_motionManager)
@@ -307,8 +312,11 @@ static CGFloat heightOfRect;
 -(UIGravityBehavior *)gravity{
     if (!_gravity) {
         UIGravityBehavior * gravity = [[UIGravityBehavior alloc] init];
+        gravity.magnitude = 0.5;
         [self.animator addBehavior:gravity];
+        
         self.gravity = gravity;
+        
     }
     return _gravity;
     
@@ -362,6 +370,83 @@ static CGFloat heightOfRect;
     }
     
     return _quicksand ;
+}
+-(void)resetGame
+{
+    self.ball.alpha = 1;
+
+}
+
+-(void)endGame
+{
+    if (CGRectContainsRect(self.doorView.bounds, self.ball.bounds)) {
+        [self pauseGame];
+        
+        [UIAlertView presentAlertViewWithTitle:@"YOU WIN" message:@"Congratulations ! " cancelButtonTitle:@"Annuler" otherButtonTitles:@[@"Recommencer"] completionHandler:^(UIAlertView *alertView, NSInteger buttonIndex) {
+            
+            switch (buttonIndex) {
+                    
+                case 0:
+                    
+                    break;
+                    
+                case 1:
+                    [self resetGame];
+                    break;
+            }
+        }];
+    }
+}
+#pragma - mark UICollisionBehaviorDelegate
+
+
+- (void)collisionBehavior:(UICollisionBehavior *)behavior endedContactForItem:(id<UIDynamicItem>)item withBoundaryIdentifier:(id<NSCopying>)identifier
+{
+    if ([item isEqual:self.ball ])
+    {
+        
+         if(CGRectContainsRect(self.doorView.frame, self.ball.frame))
+        {
+            [self pauseGame];
+            
+            [UIAlertView presentAlertViewWithTitle:@"YOU WIN" message:@"Congratulations ! " cancelButtonTitle:@"Annuler" otherButtonTitles:@[@"Recommencer"] completionHandler:^(UIAlertView *alertView, NSInteger buttonIndex) {
+                
+                switch (buttonIndex) {
+                        
+                    case 0:
+                        
+                        break;
+                        
+                    case 1:
+                        [self resetGame];
+                        break;
+                }
+            }];
+        }
+        else if (self.ball.alpha > 0)
+        {
+            self.ball.alpha -= 0.05;
+            
+        }
+        else
+        {
+            [self pauseGame];
+
+            [UIAlertView presentAlertViewWithTitle:@"GAME OVER" message:@"Just another defeat" cancelButtonTitle:@"Annuler" otherButtonTitles:@[@"Recommencer"] completionHandler:^(UIAlertView *alertView, NSInteger buttonIndex) {
+                
+                switch (buttonIndex) {
+                        
+                    case 0:
+                        
+                        break;
+                        
+                    case 1:
+                        [self resetGame];
+                        break;
+                }
+            }];
+        }
+    }
 }
 
 
