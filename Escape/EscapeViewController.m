@@ -14,6 +14,8 @@
 @property (nonatomic, strong)UIView * ball;
 @property (nonatomic, strong)UIView * doorView;
 @property (nonatomic , strong) PlaygroundView * playground;
+@property (nonatomic)BOOL won;
+@property (nonatomic)BOOL lose;
 
 // The following is strong because anything don't have
 @property (nonatomic, strong) UIDynamicAnimator* animator;
@@ -371,9 +373,14 @@ static CGFloat heightOfRect;
     
     return _quicksand ;
 }
+
+
 -(void)resetGame
 {
     self.ball.alpha = 1;
+    self.lose = NO;
+    self.won = NO;
+
 
 }
 
@@ -400,6 +407,7 @@ static CGFloat heightOfRect;
 #pragma - mark UICollisionBehaviorDelegate
 
 
+
 - (void)collisionBehavior:(UICollisionBehavior *)behavior endedContactForItem:(id<UIDynamicItem>)item withBoundaryIdentifier:(id<NSCopying>)identifier
 {
     if ([item isEqual:self.ball ])
@@ -408,18 +416,17 @@ static CGFloat heightOfRect;
          if(CGRectContainsRect(self.doorView.frame, self.ball.frame))
         {
             [self pauseGame];
-            
-            [UIAlertView presentAlertViewWithTitle:@"YOU WIN" message:@"Congratulations ! " cancelButtonTitle:@"Annuler" otherButtonTitles:@[@"Recommencer"] completionHandler:^(UIAlertView *alertView, NSInteger buttonIndex) {
-                
+            if (!self.won)
+            [UIAlertView presentAlertViewWithTitle:@"YOU WIN" message:@"Congratulations ! " cancelButtonTitle:nil otherButtonTitles:@[@"Recommencer"] completionHandler:^(UIAlertView *alertView, NSInteger buttonIndex) {
+                self.won = YES;
+
                 switch (buttonIndex) {
                         
                     case 0:
-                        
-                        break;
-                        
-                    case 1:
                         [self resetGame];
+
                         break;
+                        
                 }
             }];
         }
@@ -431,13 +438,15 @@ static CGFloat heightOfRect;
         else
         {
             [self pauseGame];
+            if (!self.lose)
+            [UIAlertView presentAlertViewWithTitle:@"GAME OVER" message:@"Just another defeat" cancelButtonTitle:@"Arrêter" otherButtonTitles:@[@"Recommencer"] completionHandler:^(UIAlertView *alertView, NSInteger buttonIndex) {
+                self.lose = YES;
 
-            [UIAlertView presentAlertViewWithTitle:@"GAME OVER" message:@"Just another defeat" cancelButtonTitle:@"Annuler" otherButtonTitles:@[@"Recommencer"] completionHandler:^(UIAlertView *alertView, NSInteger buttonIndex) {
-                
                 switch (buttonIndex) {
                         
                     case 0:
-                        
+                        // show pub !!!!!!
+
                         break;
                         
                     case 1:
