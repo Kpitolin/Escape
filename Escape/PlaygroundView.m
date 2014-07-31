@@ -29,16 +29,19 @@
 // An empty implementation adversely affects performance during animation.
 - (void)drawRect:(CGRect)rect
 {
-    self.backgroundColor = [UIColor whiteColor];
 
     // Drawing code
-    [[UIColor blackColor] setFill];
-
+    UIBezierPath * inverseBezier = [UIBezierPath bezierPathWithRect:self.bounds ];
+    [[UIColor whiteColor] setFill];
+    [inverseBezier fill];
     for (UIBezierPath * bezier  in self.bezierPathArray) {
-        [[UIColor whiteColor] setFill];
+        [[UIColor blackColor] setFill];
 
         [bezier fill];
     }
+    
+
+
    
     [self setNeedsDisplay];
 }

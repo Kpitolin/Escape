@@ -8,7 +8,7 @@
 #import <CoreMotion/CoreMotion.h>
 #import "EscapeViewController.h"
 #import "PlaygroundView.h"
-@interface EscapeViewController ()
+@interface EscapeViewController ()<UICollisionBehaviorDelegate>
 @property (nonatomic, strong)UIView * ball;
 @property (nonatomic , strong) PlaygroundView * playground;
 
@@ -80,15 +80,14 @@
 
 
 
-#define SQUARE_SIZE 40
+#define SQUARE_SIZE 20
 static CGSize SQUARE_DIMENSIONS  = {SQUARE_SIZE,SQUARE_SIZE};
 
--(UIView *)addBlockOffsetFromCenterBy: (UIOffset )offset withX:(CGFloat)width andY:(CGFloat)height
+-(UIView *)addBlockForCenter: (CGPoint )point withX:(CGFloat)width andY:(CGFloat)height
 {
     // Designing the red block
     
-    CGPoint ballCenter = CGPointMake(CGRectGetMidX(self.view.bounds) + offset.horizontal, CGRectGetMidY(self.view.bounds) + offset.vertical);
-    CGRect ball = CGRectMake(ballCenter.x-width/2, ballCenter.y-height/2, width, height);
+    CGRect ball = CGRectMake(point.x, point.y, width, height);
 
     UIView * ballView = [[UIView alloc] initWithFrame:ball];
 
@@ -106,6 +105,10 @@ static CGSize SQUARE_DIMENSIONS  = {SQUARE_SIZE,SQUARE_SIZE};
 
     
 }
+static CGPoint startPoint;
+static CGPoint finalPoint;
+static CGFloat widthOfRect;
+static CGFloat heightOfRect;
 #define WALL_WIDTH 500
 #define WALL_HEIGHT 40
 -(PlaygroundView *) createPlayGround
@@ -113,17 +116,77 @@ static CGSize SQUARE_DIMENSIONS  = {SQUARE_SIZE,SQUARE_SIZE};
     
 
     PlaygroundView* walls = [[PlaygroundView alloc ]initWithFrame:self.view.bounds ];
-    
-    UIBezierPath * path1 = [UIBezierPath bezierPathWithRect:CGRectMake( 0.0,self.view.bounds.size.height/4, self.view.bounds.size.width/3, self.view.bounds.size.height*3/4)];
-    UIBezierPath * path2 = [UIBezierPath bezierPathWithRect:CGRectMake(self.view.bounds.size.width*2/3, 0.0, self.view.bounds.size.width/3, self.view.bounds.size.height*3/4)];
-    walls.bezierPathArray = @[path1,path2];
+   
+   
+    NSMutableArray * arrayOfPaths = [[NSMutableArray alloc ]init];
     NSArray * matrice =  @[
-                                             @[ @1, @1, @1, @1],
-                                             @[ @0, @0, @0, @1],
-                                             @[ @1, @1, @0, @1],
-                                             @[ @1, @1, @0, @1],
+                                             @[ @2, @1, @1, @1, @0, @1],
+                                             @[ @0, @0, @0, @1, @0, @1],
+                                             @[ @1, @1, @0, @1, @1, @1],
+                                             @[ @0, @0, @0, @0, @0, @1],
+                                             @[ @1, @1, @0, @1, @0, @1],
+                                             @[ @0, @0, @0, @0, @0, @1],
+                                             @[ @0, @1, @0, @1, @0, @1],
+                                             @[ @0, @1, @0, @1, @0, @1],
+                                             @[ @0, @1, @0, @1, @0, @1],
+                                             @[ @1, @1, @0, @1, @4, @1],
+
+
+                                             
                                              ];
+    CGFloat dimension = 0;
+    CGPoint offsetPoint = CGPointMake(0, 0);
+        for(NSArray * array in matrice)
+    {
+        if(dimension && dimension != [array count] )
+        {
+            NSLog(@"INCORRECT MATRICE");
+            break;
+        }
+        dimension = [array count];
+
+    }
     
+     widthOfRect = self.view.bounds.size.width/dimension;
+     heightOfRect = self.view.bounds.size.height/[matrice count];
+   
+
+    for(NSArray * array in matrice)
+    {
+        offsetPoint.x = 0;
+
+        for(NSNumber * number in array)
+        {
+            
+            switch ([number intValue]) {
+                case 1:
+                {
+                    UIBezierPath * path = [UIBezierPath bezierPathWithRect:CGRectMake(offsetPoint.x,offsetPoint.y,widthOfRect ,heightOfRect) ];
+                    [arrayOfPaths addObject:path];
+                }
+                    
+                    break;
+                    
+                case 2:
+                    startPoint = offsetPoint;
+                    break;
+                    
+                    
+                    
+                case 4:
+                    finalPoint = offsetPoint;
+                    break;
+            }
+            
+            
+        
+            offsetPoint.x += widthOfRect;
+        }
+        offsetPoint.y += heightOfRect;
+
+    }
+    walls.bezierPathArray = arrayOfPaths;
+
     [self.view  addSubview: walls];
 
     return walls;
@@ -136,11 +199,7 @@ static CGSize SQUARE_DIMENSIONS  = {SQUARE_SIZE,SQUARE_SIZE};
     
     if (! self.ball && !self.playground )
     {
-        // Setting the ball  frame and color
-        self.ball = [self addBlockOffsetFromCenterBy:UIOffsetMake(0, 0) withX:SQUARE_DIMENSIONS.width andY:SQUARE_DIMENSIONS.height];
-        self.ball.layer.cornerRadius = SQUARE_SIZE/2;
-
-        self.ball.backgroundColor = [UIColor blueColor];
+        
         
         self.playground = [self createPlayGround];
         int i = 0;
@@ -149,6 +208,19 @@ static CGSize SQUARE_DIMENSIONS  = {SQUARE_SIZE,SQUARE_SIZE};
             i++;
 
         }
+        CGRect door = CGRectMake(finalPoint.x, finalPoint.y, widthOfRect, heightOfRect);
+        
+        UIView * doorView = [[UIView alloc] initWithFrame:door];
+        doorView.layer.cornerRadius = heightOfRect/4;
+        doorView.backgroundColor = [UIColor grayColor];
+
+        // Setting the ball  frame and color
+        self.ball = [self addBlockForCenter:startPoint withX:SQUARE_DIMENSIONS.width andY:SQUARE_DIMENSIONS.height];
+        self.ball.layer.cornerRadius = SQUARE_SIZE/2;
+        
+        self.ball.backgroundColor = [UIColor blackColor];
+        self.ball.alpha =0.5;
+        [self.playground addSubview:doorView];
         [self.playground addSubview:self.ball];
 
         [self.collider addItem:self.ball];
